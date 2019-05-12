@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +40,8 @@ public class LikeFragment extends Fragment {
         this.context = context;
     }
 
+    @NonNull
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //database = SQLiteDatabase.openDatabase("/data/user/0/vn.edu.nhannguyen.hinhnen/databases/dbYeuThich.db",null,SQLiteDatabase.OPEN_READWRITE);
@@ -76,4 +79,31 @@ public class LikeFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        database = context.openOrCreateDatabase("dbYeuThich.db", Context.MODE_PRIVATE,null);
+        likeImages = new ArrayList<>();
+
+        Cursor cursor = database.rawQuery("select *from YeuThich", null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Integer maImage = cursor.getInt(0);
+            String tenImage = cursor.getString(1);
+            String urlImage = cursor.getString(2);
+
+            LikeImage item = new LikeImage();
+            item.setMaSP(maImage);
+            item.setTenSP(tenImage);
+            item.setUrlSP(urlImage);
+            likeImages.add(item);
+
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        likeImageAdapter = new LikeImageAdapter(getContext(), likeImages);
+        recyclerView.setAdapter(likeImageAdapter);
+        likeImageAdapter.notifyDataSetChanged();
+    }
 }
