@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.ShowImgActivity">
+
+    <ImageView
+        android:scaleType="matrix"
+        android:gravity="center"
+        android:adjustViewBounds="true"
+        android:visibility="visible"
+        android:layout_centerInParent="true"
+        android:id="@+id/showImg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:srcCompat="@tools:sample/avatars" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="70dp"
+        android:orientation="horizontal">
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabChinh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#FCFBFB"
+            android:clickable="true"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/set_homescreen" />
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabKhoa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#FCFBFB"
+            android:clickable="true"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/set_lockscreen" />
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabCaHai"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#FCFBFB"
+            android:clickable="true"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/set_lockscreen" />
+
+    </LinearLayout>
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        app:itemBackground="@color/Background"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
+        app:menu="@menu/bottom_navigation_main">
+
+    </android.support.design.widget.BottomNavigationView>
+
+
+
+
+
+</android.support.design.widget.CoordinatorLayout>

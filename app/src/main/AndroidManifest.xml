@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="vn.edu.nhannguyen.hinhnen">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!--suppress AndroidDomInspection -->
+    <application
+        android:usesCleartextTraffic="true"
+        android:largeHeap="true"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_app"
+        android:supportsRtl="true"
+        android:label="Hình Nền"
+        android:theme="@style/MyMaterialTheme">
+
+        <activity
+            android:name=".activity.SplashActivity"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!--suppress AndroidDomInspection -->
+        <activity
+            android:name=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity
+            android:name=".activity.ShowImgActivity">
+        </activity>
+        <activity
+            android:name=".activity.ReviewActivity">
+        </activity>
+    </application>
+
+</manifest>
