@@ -86,11 +86,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private void toProcessCopyDatabaseFromAssetsToSystem() {
-        try {
-            toCopyDatabaseFormAsset();
-            Log.d("Thành công","1");
-        } catch (Exception e) {
-            Toast.makeText(MainActivity.this, "ABC" + e.toString(), Toast.LENGTH_LONG).show();
+        File file = new File(getApplicationInfo().dataDir + DB_PATH_SUFFIX);
+        if (!file.exists()) {// kiểm tra cái thư mục databases đã tồn tại chưa nếu chưa thì tạo
+            try {
+                toCopyDatabaseFormAsset();
+                Log.d("Thành công","1");
+            } catch (Exception e) {
+                Toast.makeText(MainActivity.this, "ABC" + e.toString(), Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -121,11 +124,11 @@ public class MainActivity extends AppCompatActivity {
         return getApplicationInfo().dataDir + DB_PATH_SUFFIX + DATABASE_NAME; // Trả về đường dẫn phải lưu trữ
     }
 
-    private void setupTabIcons() {
+    /*private void setupTabIcons() {
         tabLayout.getTabAt(0).setIcon(tabIcons[0]);
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
         tabLayout.getTabAt(2).setIcon(tabIcons[2]);
-    }
+    }*/
 
 
     private void setupViewPager(ViewPager viewPager) {
@@ -142,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
 
-        public ViewPagerAdapter(FragmentManager manager) {
+        private  ViewPagerAdapter(FragmentManager manager) {
             super(manager);
         }
 
@@ -156,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             return mFragmentList.size();
         }
 
-        public void addFragment(Fragment fragment, String title) {
+        private void addFragment(Fragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
         }

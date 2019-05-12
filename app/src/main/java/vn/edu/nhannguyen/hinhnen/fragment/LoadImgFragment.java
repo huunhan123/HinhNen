@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import vn.edu.nhannguyen.hinhnen.R;
+import vn.edu.nhannguyen.hinhnen.activity.MainActivity;
 import vn.edu.nhannguyen.hinhnen.adapter.LoadImageAdapter;
 import vn.edu.nhannguyen.hinhnen.model.LoadImage;
 
@@ -39,11 +41,11 @@ public class LoadImgFragment extends Fragment{
     public LoadImgFragment() {
         // Required empty public constructor
     }
+
     @NonNull
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
 
         loadImages = new ArrayList<>();
         ContentResolver contentResolver = getActivity().getContentResolver();
@@ -82,11 +84,11 @@ public class LoadImgFragment extends Fragment{
         super.onResume();
         loadImages = new ArrayList<>();
         ContentResolver contentResolver = getActivity().getContentResolver();
-        Cursor cursor = contentResolver.query(Image_URI, null, null, null,null);
+        Cursor cursor = contentResolver.query(Image_URI, null, null, null, null);
         cursor.moveToFirst();
-        while (!cursor.isAfterLast()){
-            String urlImg =cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-            String tenImg =cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME));
+        while (!cursor.isAfterLast()) {
+            String urlImg = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            String tenImg = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME));
 
 
             LoadImage item = new LoadImage();
@@ -98,7 +100,9 @@ public class LoadImgFragment extends Fragment{
             cursor.moveToNext();
         }
         cursor.close();
+
     }
+
 }
 
 

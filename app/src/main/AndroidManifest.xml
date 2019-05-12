@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="vn.edu.nhannguyen.hinhnen">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -16,9 +15,11 @@
         android:icon="@mipmap/ic_app"
         android:supportsRtl="true"
         android:label="Hình Nền"
-        android:theme="@style/MyMaterialTheme">
+        android:theme="@style/MyMaterialTheme"
+        >
 
         <activity
+            android:screenOrientation="portrait"
             android:name=".activity.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -29,13 +30,16 @@
         <!--suppress AndroidDomInspection -->
         <activity
             android:name=".activity.MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activity.ShowImgActivity">
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activity.ReviewActivity">
         </activity>
     </application>
