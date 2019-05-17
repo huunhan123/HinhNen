@@ -172,7 +172,7 @@ public class ShowImgActivity extends AppCompatActivity {
                     case R.id.action_thietlap:
                         if(!ClickSet) {
                             HienThiIconSet();
-
+                            AnIconNhieu();
                             fabChinh.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -350,6 +350,7 @@ public class ShowImgActivity extends AppCompatActivity {
                        // Toast.makeText(ShowImgActivity.this, "Recents", Toast.LENGTH_SHORT).show();
                     case R.id.action_yeuthich:
                         AnIconSet();
+                        AnIconNhieu();
                         Cursor cursor = database.rawQuery("select maSP from YeuThich where maSP = "+maImage,null);
                         ContentValues values = new ContentValues();
                         values.put("maSP", maImage);
@@ -378,6 +379,7 @@ public class ShowImgActivity extends AppCompatActivity {
                         break;
                     case R.id.action_luu:
                         AnIconSet();
+                        AnIconNhieu();
                         if(ActivityCompat.checkSelfPermission(ShowImgActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                 requestPermissions(new String[]{
@@ -455,6 +457,7 @@ public class ShowImgActivity extends AppCompatActivity {
                         break;
                     case R.id.action_xemtruoc:
                         AnIconSet();
+                        AnIconNhieu();
                         Intent intent = new Intent(ShowImgActivity.this, ReviewActivity.class);
                         intent.putExtra("sp", urlImage);
                         startActivity(intent);
