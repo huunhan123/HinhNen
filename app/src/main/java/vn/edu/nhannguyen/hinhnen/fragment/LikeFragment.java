@@ -36,6 +36,10 @@ public class LikeFragment extends Fragment {
     private Context context;
 
 
+    /*public LikeFragment (Context context) {
+        this.context = context;
+    }*/
+
     public LikeFragment(Context context) {
         this.context = context;
     }

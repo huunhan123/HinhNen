@@ -13,7 +13,13 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -35,12 +41,18 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import dmax.dialog.SpotsDialog;
 import vn.edu.nhannguyen.hinhnen.R;
@@ -54,15 +66,16 @@ import static android.app.WallpaperManager.getInstance;
 
 public class ShowImgActivity extends AppCompatActivity {
     ImageView img;
-    FloatingActionButton fabOption, favorites, fab_set, fab_save, fab_share, un_option,fabChinh, fabKhoa, fabCaHai;
+    FloatingActionButton fabChinh, fabKhoa, fabCaHai, fabShare, fabCrop;
     BottomNavigationView bottomNavigationView;
     String urlImage;
     String tenImage;
     int maImage;
     SQLiteDatabase database = null;
 
-    boolean  Click = false;
-    boolean  flagDownload = false;
+    boolean ClickSet = false;
+    boolean ClickNhieu = false;
+    boolean flagDownload = false;
     private static final int PERMISSION_REQUEST_CODE = 1000 ;
 
 
@@ -110,6 +123,8 @@ public class ShowImgActivity extends AppCompatActivity {
         fabChinh = findViewById(R.id.fabChinh);
         fabKhoa = findViewById(R.id.fabKhoa);
         fabCaHai = findViewById(R.id.fabCaHai);
+        fabShare = findViewById(R.id.fabShare);
+        fabCrop = findViewById(R.id.fabCrop);
 
     }
 
@@ -121,13 +136,15 @@ public class ShowImgActivity extends AppCompatActivity {
         tenImage = intent.getStringExtra("tenImage");
         maImage = intent.getIntExtra("maImage",0);
         //Log.e("ID", String.valueOf(maImage));
-        //Toast.makeText(this, String.valueOf(maImage), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, urlImage, Toast.LENGTH_SHORT).show();
         final Menu menu = bottomNavigationView.getMenu();
+
         //set menu cho fragment tải về
         if(getIntent().getStringExtra("flag").equals("Off")){
             //Toast.makeText(this, "Ok", Toast.LENGTH_SHORT).show();
             menu.findItem(R.id.action_luu).setVisible(false);
             menu.findItem(R.id.action_yeuthich).setVisible(false);
+            //menu.findItem(R.id.action_nhieuhon).setVisible(false);
         }
         // set menu cho fragment yêu thích
         if(getIntent().getStringExtra("flag").equals("Onn")){
@@ -153,14 +170,14 @@ public class ShowImgActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_thietlap:
-                        if(Click == false) {
-                            HienThiIcon();
+                        if(!ClickSet) {
+                            HienThiIconSet();
 
                             fabChinh.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     // AlertDialog.Builder builder = new AlertDialog.Builder(ShowImgActivity.this,R.style.AlertDialogCustom);
-                                    AnIcon();
+                                    AnIconSet();
                                     AlertDialog.Builder builder = new AlertDialog.Builder(ShowImgActivity.this);
                                     builder.setTitle("Xác Nhận");
                                     builder.setMessage("Bạn có muốn cài hình nền không?");
@@ -214,7 +231,7 @@ public class ShowImgActivity extends AppCompatActivity {
                             fabKhoa.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    AnIcon();
+                                    AnIconSet();
                                     AlertDialog.Builder builder = new AlertDialog.Builder(ShowImgActivity.this);
                                     builder.setTitle("Xác Nhận");
                                     builder.setMessage("Bạn có muốn cài hình nền không?");
@@ -270,7 +287,7 @@ public class ShowImgActivity extends AppCompatActivity {
                             fabCaHai.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    AnIcon();
+                                    AnIconSet();
                                     AlertDialog.Builder builder = new AlertDialog.Builder(ShowImgActivity.this);
                                     builder.setTitle("Xác Nhận");
                                     builder.setMessage("Bạn có muốn cài hình nền không?");
@@ -327,12 +344,12 @@ public class ShowImgActivity extends AppCompatActivity {
 
                         }
                         else{
-                            AnIcon();
+                            AnIconSet();
                         }
                         break;
                        // Toast.makeText(ShowImgActivity.this, "Recents", Toast.LENGTH_SHORT).show();
                     case R.id.action_yeuthich:
-                        AnIcon();
+                        AnIconSet();
                         Cursor cursor = database.rawQuery("select maSP from YeuThich where maSP = "+maImage,null);
                         ContentValues values = new ContentValues();
                         values.put("maSP", maImage);
@@ -345,32 +362,31 @@ public class ShowImgActivity extends AppCompatActivity {
                                 msg = "Thêm thất bại";
                             }
                             else {
-                                Log.e("databasssssse",database.getPath());
-                                msg = "Thêm thành công";
+                                //Log.e("databasssssse",database.getPath());
+                                msg = "Yêu thích";
                             }
-                            //Toast.makeText(ShowImgActivity.this, msg, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ShowImgActivity.this, msg, Toast.LENGTH_SHORT).show();
                             menu.findItem(R.id.action_yeuthich).setIcon(R.drawable.ic_action_favoutite);
                         }
                         else {
                             database.delete("YeuThich","maSP =?", new String[]{String.valueOf(maImage)});
                             menu.findItem(R.id.action_yeuthich).setIcon(R.drawable.ic_action_non_favoutite);
-                            //Toast.makeText(ShowImgActivity.this, "Xóa thành công", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ShowImgActivity.this, "Hủy yêu thích", Toast.LENGTH_SHORT).show();
                         }
                         //Toast.makeText(ShowImgActivity.this, "Yêu thích", Toast.LENGTH_SHORT).show();
                         cursor.close();
                         break;
                     case R.id.action_luu:
-                        AnIcon();
+                        AnIconSet();
                         if(ActivityCompat.checkSelfPermission(ShowImgActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                 requestPermissions(new String[]{
                                         Manifest.permission.WRITE_EXTERNAL_STORAGE
 
-
                                 },PERMISSION_REQUEST_CODE);
                             }
 
-                        if(flagDownload == false){
+                        if(!flagDownload){
                             String url = urlImage;
                             String fileName = tenImage;
                             //Toast.makeText(ShowImgActivity.this, fileName, Toast.LENGTH_SHORT).show();
@@ -395,22 +411,52 @@ public class ShowImgActivity extends AppCompatActivity {
                             break;
                         }
 
-                    case R.id.action_share:
-                        AnIcon();
+                    case R.id.action_nhieuhon:
+                        AnIconSet();
 
-                        Intent ShareIntent = new Intent(Intent.ACTION_SEND);
-                        ShareIntent.setType("text/plain");
-                        ShareIntent.putExtra(Intent.EXTRA_SUBJECT, "the title");
-                        ShareIntent.putExtra(Intent.EXTRA_TEXT, urlImage);
-                        startActivity(Intent.createChooser(ShareIntent, "Share Using"));
+                        if(!ClickNhieu){
+                            HienThiIconNhieu();
+                            if(getIntent().getStringExtra("flag").equals("Off")){
+                                fabCrop.hide();
+                            }
+                            fabShare.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    AnIconNhieu();
+                                    Intent ShareIntent = new Intent(Intent.ACTION_SEND);
+                                    ShareIntent.setType("text/plain");
+                                    ShareIntent.putExtra(Intent.EXTRA_SUBJECT, "the title");
+                                    ShareIntent.putExtra(Intent.EXTRA_TEXT, urlImage);
+                                    startActivity(Intent.createChooser(ShareIntent, "Share Using"));
+                                }
+                            });
+
+                            fabCrop.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    AnIconNhieu();
+                                    Bitmap bitmap = getImageBitmapFromURL(ShowImgActivity.this,urlImage);
+                                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                    //Toast.makeText(ShowImgActivity.this,urlImage,Toast.LENGTH_LONG).show();
+                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                                    byte[] byteArray = stream.toByteArray();
+                                    Intent intent = new Intent(ShowImgActivity.this, CropImageActivity.class);
+                                    intent.putExtra("crop",byteArray);
+                                    startActivity(intent);
+                                    //Toast.makeText(ShowImgActivity.this,"Sent Success",Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                        else {
+                            AnIconNhieu();
+                        }
+
                         //Toast.makeText(ShowImgActivity.this, "Lưu thành công", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_xemtruoc:
-                        AnIcon();
-                        String urlHinh;
+                        AnIconSet();
                         Intent intent = new Intent(ShowImgActivity.this, ReviewActivity.class);
-                        urlHinh = urlImage;
-                        intent.putExtra("sp", urlHinh);
+                        intent.putExtra("sp", urlImage);
                         startActivity(intent);
                         //Toast.makeText(ShowImgActivity.this,urlHinh, Toast.LENGTH_SHORT).show();
 
@@ -422,127 +468,57 @@ public class ShowImgActivity extends AppCompatActivity {
                 return true;
             }
 
-            private void HienThiIcon() {
-                fabChinh.show();
-                fabKhoa.show();
-                fabCaHai.show();
-                Click = true;
-            }
-            private void AnIcon() {
-                fabChinh.hide();
-                fabKhoa.hide();
-                fabCaHai.hide();
-                Click =false;
-            }
+
         });
-
-        /*fabOption.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                HienThiIcon();
-            }
-        });
-        //?n các icon save, share, set
-        un_option.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AnIcon();
-            }
-        });
-
-        fab_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
-
-
-        //S? ki?n share
-        fab_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent ShareIntent = new Intent(Intent.ACTION_SEND);
-                ShareIntent.setType("text/plain");
-                ShareIntent.putExtra(Intent.EXTRA_SUBJECT, "the title");
-                ShareIntent.putExtra(Intent.EXTRA_TEXT, sanPham.getHinhSP());
-                startActivity(Intent.createChooser(ShareIntent, "Share Using"));
-            }
-        });
-        //s? ki?n set
-        fab_set.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                // AlertDialog.Builder builder = new AlertDialog.Builder(ShowImgActivity.this,R.style.AlertDialogCustom);
-                AlertDialog.Builder builder = new AlertDialog.Builder(ShowImgActivity.this);
-                builder.setTitle("Xác Nhận");
-                builder.setMessage("Bạn có muốn cài hình nền không?");
-                builder.setCancelable(true);
-                builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                        Glide.with(getApplicationContext()).asBitmap()
-                                .load(sanPham.getHinhSP())
-                                .into(new SimpleTarget<Bitmap>() {
-                                    @Override
-                                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                                        // img.setImageBitmap(resource);
-                                        try {
-                                            WallpaperManager manager = WallpaperManager.getInstance(getApplicationContext());
-                                            manager.setBitmap(resource);
-                                            Toast.makeText(ShowImgActivity.this, "Cài đặt thành công", Toast.LENGTH_SHORT).show();
-
-                                        } catch (IOException e) {
-                                            Toast.makeText(ShowImgActivity.this, "Cài đặt không thành công", Toast.LENGTH_SHORT).show();
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                });
-
-                    }
-                });
-                builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-                final AlertDialog alertDialog = builder.create();
-                alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
-                    @SuppressLint("ResourceAsColor")
-                    @Override
-                    public void onShow(DialogInterface arg0) {
-                        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#ecf0f1"));
-                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#ecf0f1"));
-                    }
-                });
-                alertDialog.show();
-                //set màu cho ch? xác nh?n
-                int textViewId = alertDialog.getContext().getResources().getIdentifier("android:id/alertTitle", null, null);
-                TextView tv = (TextView) alertDialog.findViewById(textViewId);
-                tv.setTextColor(Color.parseColor("#ecf0f1"));
-            }
-        });
-        //set img
-
     }
-
-
-    private void HienThiIcon() {
-        fab_set.show();
-        fab_save.show();
-        fab_share.show();
-        un_option.show();
+    private void HienThiIconSet() {
+        fabChinh.show();
+        fabKhoa.show();
+        fabCaHai.show();
+        ClickSet = true;
     }
-
-    private void AnIcon() {
-        fab_set.hide();
-        fab_save.hide();
-        fab_share.hide();
-        un_option.hide();
-    }*/
-}
+    private void AnIconSet() {
+        fabChinh.hide();
+        fabKhoa.hide();
+        fabCaHai.hide();
+        ClickSet = false;
+    }
+    private void HienThiIconNhieu(){
+        fabShare.show();
+        fabCrop.show();
+        ClickNhieu = true;
+    }
+    private void AnIconNhieu(){
+        fabShare.hide();
+        fabCrop.hide();
+        ClickNhieu = false;
+    }
+    public static Bitmap getImageBitmapFromURL(final Context context1, final String url){
+        Bitmap imageBitmap = null;
+        try {
+            imageBitmap = new AsyncTask<Void, Void, Bitmap>() {
+                @Override
+                protected Bitmap doInBackground(Void... params) {
+                    try {
+                        url.trim();
+                        return Picasso.with(context1).load(url)
+                                //.resize(targetWidth, targetHeight)
+                                //.placeholder(R.drawable.raw_image)
+                                //.error(R.drawable.raw_error_image)
+                                .get();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            }.execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return imageBitmap;
+    }
 }
 
 

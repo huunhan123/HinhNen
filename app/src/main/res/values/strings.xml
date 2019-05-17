@@ -20,4 +20,7 @@
     <string name="text_cahai">Đặt cả hai</string>
     <string name="text_dathinhnen">Đặt hình nền</string>
     <string name="text_share">Chia sẻ</string>
+    <string name="text_nhieu">Nhiều hơn</string>
+    <string name="text_crop">Xén ảnh</string>
+
 </resources>

@@ -20,7 +20,7 @@
 
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_marginBottom="70dp"
@@ -58,6 +58,41 @@
             android:clickable="true"
             android:visibility="invisible"
             app:srcCompat="@drawable/set_lockscreen" />
+
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="280dp"
+        android:layout_marginBottom="70dp"
+        android:orientation="horizontal">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabCrop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#FCFBFB"
+            android:clickable="true"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/ic_crop"
+            tools:ignore="VectorDrawableCompat" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabShare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#FCFBFB"
+            android:clickable="true"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/ic_share"
+            tools:ignore="VectorDrawableCompat" />
+
 
     </LinearLayout>
 

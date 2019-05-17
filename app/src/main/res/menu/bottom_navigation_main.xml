@@ -23,8 +23,9 @@
         android:title="@string/text_luu"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_share"
-        android:icon="@drawable/ic_action_share"
-        android:title="@string/text_share"
+        android:id="@+id/action_nhieuhon"
+        android:icon="@drawable/ic_action_nhieuhon"
+        android:title="@string/text_nhieu"
         app:showAsAction="ifRoom" />
+
 </menu>
